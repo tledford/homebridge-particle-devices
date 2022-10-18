@@ -24,7 +24,8 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "homebridge-plugin, "
+    "homebridge-plugin",
+    "particle"
   ],
   "dependencies": {
     "abort-controller": "^3.0.0",
