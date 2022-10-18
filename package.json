@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Particle Devices",
   "name": "homebridge-particle-devices",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A Homebridge Platform for connecting to various Particle-powered systems. Currently only supports garage doors, but front door lock support is on the way.",
   "license": "Apache-2.0",
   "repository": {
