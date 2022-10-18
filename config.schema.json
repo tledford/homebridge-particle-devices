@@ -1,15 +1,67 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "ParticleDeviceLink",
   "pluginType": "platform",
   "singular": true,
   "schema": {
-    "type": "object",
-    "properties": {
-      "name": {
-        "title": "Name",
-        "type": "string",
-        "required": true,
-        "default": "Example Dynamic Platform"
+    "devices": {
+      "type": "array",
+      "items": {
+        "title": "Device",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "required": true,
+            "placeholder": "Main Garage Door"
+          },
+          "type": {
+            "title": "Device Type",
+            "type": "string",
+            "required": true,
+            "default": "garage_door_opener",
+            "oneOf": [
+              { "title": "Garage Door Opener", "enum": ["garage_door_opener"] },
+              { "title": "Door Lock Controller (NOT SUPPORTED)", "enum": ["door_controller"] }
+            ]
+          },
+          "access_token": {
+            "title": "Access Token",
+            "type": "string",
+            "required": true,
+            "placeholder": "Access Token generated from Particle CLI (https://docs.particle.io/reference/cloud-apis/access-tokens/)"
+          },
+          "device_id": {
+            "title": "Device ID",
+            "type": "string",
+            "required": true,
+            "placeholder": "ID of Particle device (https://console.particle.io/devices)"
+          },
+          "doorOpensInSeconds": {
+            "title": "Door movement time (seconds)",
+            "type": "string",
+            "required": false,
+            "placeholder": "How long it takes your garage door to open or close"
+          },
+          "doorStateChangedEventName": {
+            "title": "Particle.publish() name",
+            "type": "string",
+            "required": true,
+            "placeholder": "Name of cloud event published on state change"
+          },
+          "doorOpenCloseFunctionName": {
+            "title": "Particle.function() name",
+            "type": "string",
+            "required": true,
+            "placeholder": "Name of cloud function to open/close or lock/unlock door"
+          },
+          "doorOpenSensorVariableName": {
+            "title": "Particle.variable() name",
+            "type": "string",
+            "required": true,
+            "placeholder": "Name of cloud variable that exposes current door position"
+          }
+        }
       }
     }
   }
