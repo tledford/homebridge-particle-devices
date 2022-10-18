@@ -39,7 +39,7 @@
           },
           "doorOpensInSeconds": {
             "title": "Door movement time (seconds)",
-            "type": "string",
+            "type": "number",
             "required": false,
             "placeholder": "How long it takes your garage door to open or close"
           },

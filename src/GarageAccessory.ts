@@ -123,7 +123,7 @@ export class GarageOpenerPlatformAccessory {
   private fetchCurrentState(callback?: Function): any {
     const isClosedUrl =
       this.url + 'devices/' + this.deviceId + '/' + this.variableName + '?access_token=' + this.accessToken;
-
+    this.platform.log.debug('URL: ', isClosedUrl);
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), this.requestTimeout);
     fetch(isClosedUrl, { signal: controller.signal })
