@@ -7,10 +7,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tledford/homebridge-particle-garage.git"
+    "url": "https://github.com/tledford/homebridge-particle-devices.git"
   },
   "bugs": {
-    "url": "https://github.com/tledford/homebridge-particle-garage/issues"
+    "url": "https://github.com/tledford/homebridge-particle-devices/issues"
   },
   "engines": {
     "node": ">=14.18.1",
