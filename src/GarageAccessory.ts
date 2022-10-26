@@ -39,6 +39,7 @@ export class GarageOpenerPlatformAccessory {
   private variableName: string;
   private x = 1;
   private isClosed: boolean = false;
+  private moving = false;
 
   private most_recent_target_door_state;
 
@@ -104,11 +105,24 @@ export class GarageOpenerPlatformAccessory {
 
     es.addEventListener(this.eventName, this.doorStateDidChange.bind(this), false);
 
+    this.fetchCurrentState(this.updateStates.bind(this));
+
+    setInterval(this.fetchCurrentState.bind(this, this.updateStates.bind(this)), 1 * 60 * 1000);
+
     // this.fetchCurrentState(this.updateStates.bind(this));
     // setInterval(this.doThings.bind(this), 10000);
   }
 
   private doorStateDidChange(e) {
+    if (this.moving) {
+      setTimeout(this.handleDoorStateChanged.bind(this, e), 2000);
+    } else {
+      this.handleDoorStateChanged(e);
+    }
+  }
+
+  private handleDoorStateChanged(e) {
+    this.moving = false;
     var data = JSON.parse(e.data);
 
     this.platform.log.debug('doorStateDidChange: ' + data.data);
@@ -123,7 +137,7 @@ export class GarageOpenerPlatformAccessory {
   private fetchCurrentState(callback?: Function): any {
     const isClosedUrl =
       this.url + 'devices/' + this.deviceId + '/' + this.variableName + '?access_token=' + this.accessToken;
-    this.platform.log.debug('URL: ', isClosedUrl);
+    // this.platform.log.debug('URL: ', isClosedUrl);
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), this.requestTimeout);
     fetch(isClosedUrl, { signal: controller.signal })
@@ -138,6 +152,7 @@ export class GarageOpenerPlatformAccessory {
       })
       .then((data) => {
         const result = data['result'];
+        this.platform.log.debug('current state: ' + (result === 0 ? 'closed' : 'open'));
         if (result == 0) {
           // 0 from Particle means closed
           if (callback) callback(null, this.CurrentDoorState.CLOSED);
@@ -163,7 +178,7 @@ export class GarageOpenerPlatformAccessory {
   }
 
   private updateStates(error, state) {
-    this.platform.log.debug('Updating states: isClosed=', state == this.CurrentDoorState.CLOSED);
+    // this.platform.log.debug('Updating states: isClosed=', state == this.CurrentDoorState.CLOSED);
     if (!error) {
       this.isClosed = state == this.CurrentDoorState.CLOSED;
       this.most_recent_target_door_state = this.isClosed
@@ -183,12 +198,14 @@ export class GarageOpenerPlatformAccessory {
    * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
    */
   private handleTargetDoorStateSet(value: CharacteristicValue, callback: CharacteristicSetCallback) {
+    this.moving = true;
     this.platform.log.debug('handleTargetDoorStateSet() ->', value);
     this.most_recent_target_door_state = value;
 
     const newCurrentState =
       value == this.TargetDoorState.OPEN ? this.CurrentDoorState.OPENING : this.CurrentDoorState.CLOSING;
     this.garage_service.updateCharacteristic(this.CurrentDoorState, newCurrentState);
+    this.platform.log.debug('setting currentDoorState to ->', newCurrentState);
 
     const openCloseUrl = this.url + 'devices/' + this.deviceId + '/' + this.functionName;
 
@@ -217,6 +234,10 @@ export class GarageOpenerPlatformAccessory {
         callback(error);
       });
 
+    setTimeout(() => {
+      this.moving = false;
+    }, 3000);
+
     setTimeout(
       this.fetchCurrentState.bind(this, this.updateStates.bind(this)),
       (this.doorOpensInSeconds || 20) * 1000
@@ -230,8 +251,15 @@ export class GarageOpenerPlatformAccessory {
 
   private handleCurrentDoorStateGet(callback: CharacteristicGetCallback) {
     this.platform.log.debug('handleCurrentDoorStateGet() -> ');
-    this.fetchCurrentState(this.updateStates.bind(this));
-    callback(HAPStatus.SUCCESS, null);
+    this.fetchCurrentState(callback);
+    // this.platform.log.debug('done');
+    // if (stateOrError instanceof Error) {
+    //   this.updateStates(stateOrError, null);
+    //   callback(HAPStatus.SERVICE_COMMUNICATION_FAILURE, null);
+    // } else {
+    //   this.updateStates(null, stateOrError);
+    //   callback(null, stateOrError);
+    // }
   }
 
   // private handleCurrentDoorStateGet(): Promise<CharacteristicValue> {
@@ -254,25 +282,3 @@ export class GarageOpenerPlatformAccessory {
     );
   }
 }
-
-// doThings() {
-//   // start closing the door
-//   if (this.x == 1) {
-//     this.x = 2;
-//     this.garage_service.updateCharacteristic(this.TargetDoorState, this.TargetDoorState.CLOSED);
-//     this.garage_service.updateCharacteristic(this.CurrentDoorState, this.CurrentDoorState.CLOSING);
-//   } else if (this.x == 2) {
-//     this.x = 3;
-//     //door is fully closed (sends notification)
-//     this.garage_service.updateCharacteristic(this.CurrentDoorState, this.CurrentDoorState.CLOSED);
-//   } else if (this.x == 3) {
-//     this.x = 4;
-//     // starting opening the door (sends notification)
-//     this.garage_service.updateCharacteristic(this.TargetDoorState, this.TargetDoorState.OPEN);
-//     this.garage_service.updateCharacteristic(this.CurrentDoorState, this.CurrentDoorState.OPENING);
-//   } else if (this.x == 4) {
-//     this.x = 1;
-//     // door is fully open
-//     this.garage_service.updateCharacteristic(this.CurrentDoorState, this.CurrentDoorState.OPEN);
-//   }
-// }
