@@ -105,7 +105,6 @@ export class ParticleHomebridgePlatform implements DynamicPlatformPlugin {
       }
     }
 
-    // TODO
     // Next, find all devices in config of type 'door_controller'
     const door_controllers = this.config['devices'].filter((device) => device.type === 'door_controller');
 
@@ -114,7 +113,9 @@ export class ParticleHomebridgePlatform implements DynamicPlatformPlugin {
       // generate a unique id for the accessory this should be generated from
       // something globally unique, but constant, for example, the device serial
       // number or MAC address
-      const uuid = this.api.hap.uuid.generate(device.device_id + device.doorOpenCloseFunctionName);
+      const uuid = this.api.hap.uuid.generate(
+        device.device_id + device.type + device.doorOpenCloseFunctionName
+      );
 
       // see if an accessory with the same uuid has already been registered and restored from
       // the cached devices we stored in the `configureAccessory` method above

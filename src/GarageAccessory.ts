@@ -122,15 +122,17 @@ export class GarageOpenerPlatformAccessory {
   }
 
   private handleDoorStateChanged(e) {
-    this.moving = false;
-    var data = JSON.parse(e.data);
+    if (e.deviceid === this.deviceId) {
+      this.moving = false;
+      var data = JSON.parse(e.data);
 
-    this.platform.log.debug('doorStateDidChange: ' + data.data);
+      this.platform.log.debug('doorStateDidChange: ' + data.data);
 
-    if (data.data == 'door-opened') {
-      this.updateStates(null, this.CurrentDoorState.OPEN);
-    } else if (data.data == 'door-closed') {
-      this.updateStates(null, this.CurrentDoorState.CLOSED);
+      if (data.data == 'door-opened') {
+        this.updateStates(null, this.CurrentDoorState.OPEN);
+      } else if (data.data == 'door-closed') {
+        this.updateStates(null, this.CurrentDoorState.CLOSED);
+      }
     }
   }
 
