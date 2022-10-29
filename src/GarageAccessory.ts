@@ -122,9 +122,9 @@ export class GarageOpenerPlatformAccessory {
   }
 
   private handleDoorStateChanged(e) {
-    if (e.deviceid === this.deviceId) {
+    var data = JSON.parse(e.data);
+    if (data.coreid === this.deviceId) {
       this.moving = false;
-      var data = JSON.parse(e.data);
 
       this.platform.log.debug('doorStateDidChange: ' + data.data);
 
