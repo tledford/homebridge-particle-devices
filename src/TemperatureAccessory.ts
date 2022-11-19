@@ -46,7 +46,8 @@ export class TemperatureAccessory {
         return response.json();
       })
       .then((data) => {
-        const temp = data['currTemp'];
+        let temp: number = data['currTemp'];
+        temp = (temp - 32) * (5 / 9);
         callback(null, temp);
       })
       .catch((error) => {
