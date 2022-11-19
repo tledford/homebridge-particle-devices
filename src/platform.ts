@@ -11,6 +11,7 @@ import {
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { GarageOpenerPlatformAccessory } from './GarageAccessory';
 import { DoorLockPlatformAccessory } from './DoorLockAccessory';
+import { FireplaceAccessory } from './FireplaceAccessory';
 
 /**
  * HomebridgePlatform
@@ -153,6 +154,28 @@ export class ParticleHomebridgePlatform implements DynamicPlatformPlugin {
         new DoorLockPlatformAccessory(this, accessory);
 
         // link the accessory to your platform
+        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      }
+    }
+
+    const fireplaces = this.config['devices'].filter((device) => device.type === 'fireplace');
+
+    for (const fireplace of fireplaces) {
+      const uuid = this.api.hap.uuid.generate(fireplace.fireplaceUrl);
+
+      const existingAccessory = this.accessories.find((accessory) => accessory.UUID === uuid);
+
+      if (existingAccessory) {
+        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        new FireplaceAccessory(this, existingAccessory);
+      } else {
+        this.log.info('Adding new accessory:', fireplace.name);
+
+        const accessory = new this.api.platformAccessory(fireplace.name, uuid);
+        accessory.context.device = fireplace;
+
+        new FireplaceAccessory(this, accessory);
+
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       }
     }

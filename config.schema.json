@@ -22,7 +22,8 @@
             "default": "garage_door_opener",
             "oneOf": [
               { "title": "Garage Door Opener", "enum": ["garage_door_opener"] },
-              { "title": "Door Lock Controller (NOT SUPPORTED)", "enum": ["door_controller"] }
+              { "title": "Door Lock Controller", "enum": ["door_controller"] },
+              { "title": "Fireplace", "enum": ["fireplace"] }
             ]
           },
           "access_token": {
@@ -60,6 +61,12 @@
             "type": "string",
             "required": true,
             "placeholder": "Name of cloud variable that exposes current door position"
+          },
+          "fireplaceUrl": {
+            "title": "Fireplace URL",
+            "type": "string",
+            "required": false,
+            "placeholder": "URL to toggle the fireplace device"
           }
         }
       }
