@@ -107,7 +107,7 @@ export class GarageOpenerPlatformAccessory {
 
     this.fetchCurrentState(this.updateStates.bind(this));
 
-    setInterval(this.fetchCurrentState.bind(this, this.updateStates.bind(this)), 1 * 60 * 1000);
+    // setInterval(this.fetchCurrentState.bind(this, this.updateStates.bind(this)), 1 * 60 * 1000);
 
     // this.fetchCurrentState(this.updateStates.bind(this));
     // setInterval(this.doThings.bind(this), 10000);
