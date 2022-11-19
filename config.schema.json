@@ -23,7 +23,8 @@
             "oneOf": [
               { "title": "Garage Door Opener", "enum": ["garage_door_opener"] },
               { "title": "Door Lock Controller", "enum": ["door_controller"] },
-              { "title": "Fireplace", "enum": ["fireplace"] }
+              { "title": "Fireplace", "enum": ["fireplace"] },
+              { "title": "Temperature Sensor", "enum": ["temperature"] }
             ]
           },
           "access_token": {
@@ -67,6 +68,12 @@
             "type": "string",
             "required": false,
             "placeholder": "URL to toggle the fireplace device"
+          },
+          "currTempUrl": {
+            "title": "Temp Sensor URL",
+            "type": "string",
+            "required": false,
+            "placeholder": "URL to retrieve a current thermometer value"
           }
         }
       }

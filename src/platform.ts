@@ -12,6 +12,7 @@ import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { GarageOpenerPlatformAccessory } from './GarageAccessory';
 import { DoorLockPlatformAccessory } from './DoorLockAccessory';
 import { FireplaceAccessory } from './FireplaceAccessory';
+import { TemperatureAccessory } from './TemperatureAccessory';
 
 /**
  * HomebridgePlatform
@@ -175,6 +176,28 @@ export class ParticleHomebridgePlatform implements DynamicPlatformPlugin {
         accessory.context.device = fireplace;
 
         new FireplaceAccessory(this, accessory);
+
+        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      }
+    }
+
+    const temperatures = this.config['devices'].filter((device) => device.type === 'temperature');
+
+    for (const temperature of temperatures) {
+      const uuid = this.api.hap.uuid.generate(temperature.currTempUrl);
+
+      const existingAccessory = this.accessories.find((accessory) => accessory.UUID === uuid);
+
+      if (existingAccessory) {
+        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        new TemperatureAccessory(this, existingAccessory);
+      } else {
+        this.log.info('Adding new accessory:', temperature.name);
+
+        const accessory = new this.api.platformAccessory(temperature.name, uuid);
+        accessory.context.device = temperature;
+
+        new TemperatureAccessory(this, accessory);
 
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       }

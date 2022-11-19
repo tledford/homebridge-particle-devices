@@ -11,47 +11,43 @@ import { ParticleHomebridgePlatform } from './platform';
 
 const fetch = require('node-fetch');
 
-export class FireplaceAccessory {
-  private fireplace_service: Service;
+export class TemperatureAccessory {
+  private temp_sensor_service: Service;
   private Service: typeof Service;
   private Characteristic: typeof Characteristic;
-  private current_state: boolean;
 
   constructor(
     private readonly platform: ParticleHomebridgePlatform,
     private readonly accessory: PlatformAccessory
   ) {
-    this.current_state = false;
     this.Service = this.platform.Service;
     this.Characteristic = this.platform.Characteristic;
 
     // set accessory information
     this.accessory
       .getService(this.Service.AccessoryInformation)!
-      .setCharacteristic(this.Characteristic.Manufacturer, 'NodeMCU')
-      .setCharacteristic(this.Characteristic.Model, 'Fireplace');
+      .setCharacteristic(this.Characteristic.Manufacturer, 'Zigbee')
+      .setCharacteristic(this.Characteristic.Model, 'Temp Sensor');
 
-    this.fireplace_service =
-      this.accessory.getService(this.Service.Switch) || this.accessory.addService(this.Service.Switch);
+    this.temp_sensor_service =
+      this.accessory.getService(this.Service.TemperatureSensor) ||
+      this.accessory.addService(this.Service.TemperatureSensor);
 
-    this.fireplace_service.setCharacteristic(this.Characteristic.Name, 'Fireplace');
+    this.temp_sensor_service.setCharacteristic(this.Characteristic.Name, 'Indoor Temperature');
 
-    this.fireplace_service
-      .getCharacteristic(this.Characteristic.On)
-      .on(CharacteristicEventTypes.SET, this.handleOnSet.bind(this))
+    this.temp_sensor_service
+      .getCharacteristic(this.Characteristic.CurrentTemperature)
       .on(CharacteristicEventTypes.GET, this.handleOnGet.bind(this));
   }
 
   private handleOnGet(callback: CharacteristicGetCallback) {
-    callback(null, this.current_state);
-  }
-
-  private handleOnSet(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-    fetch(this.accessory.context.device.fireplaceUrl)
+    fetch(this.accessory.context.device.currTempUrl)
       .then((response) => {
-        this.current_state = !this.current_state;
-        callback();
-        this.fireplace_service.updateCharacteristic(this.Characteristic.On, this.current_state);
+        return response.json();
+      })
+      .then((data) => {
+        const temp = data['currTemp'];
+        callback(null, temp);
       })
       .catch((error) => {
         this.platform.log.error(error);
